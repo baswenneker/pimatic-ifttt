@@ -1,6 +1,4 @@
 # https://github.com/fcingolani/node-ifttt
-# http://83.84.103.87:4567/api/devices/ifttt-device/setPresent
-# localhost:4567/api/devices/ifttt-device/toggle
 
 module.exports = (env) ->
 

@@ -3,14 +3,14 @@ module.exports = {
   IFTTTDevice: {
     title: "IFTTTDevice config options"
     type: "object"
-    properties:
-      host:
+    properties: {}
+      ###host:
         description: "the ip or hostname to ping"
         type: "string"
         default: ""
       interval:
         description: "the delay between pings"
         type: "number"
-        default: 5000
+        default: 5000###
   }
 }
