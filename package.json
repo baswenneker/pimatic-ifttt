@@ -7,14 +7,15 @@
     "pimatic-ifttt.coffee",
     "device-config-schema.coffee",
     "ifttt-config-schema.coffee",
+    "LICENSE",
     "README.md"
   ],
   "version": "0.8.0",
-  "homepage": "http://your-plugin-website",
+  "homepage": "http://baswenneker.github.io",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "git://github.com/pimatic/pimatic-plugin-template.git"
+    "url": "git://github.com/baswenneker/pimatic-ifttt.git"
   },
   "configSchema": "ifttt-config-schema.coffee",
   "dependencies": {},

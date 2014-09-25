@@ -27,11 +27,12 @@ module.exports = (env) ->
     #     
     # 
     init: (app, @framework, @config) =>
-      env.logger.debug("IFTTTPlugin init")
-
       deviceConfigDef = require("./device-config-schema")
       
-      @framework.ruleManager.addPredicateProvider(new TriggerPredicateProvider(@framework))
+      # Add the predicate provider to enable the following rules:
+      #   IF my-ifttt-device is triggered
+      #   IF my-ifttt-device is waiting
+      @framework.ruleManager.addPredicateProvider(new IFTTTTriggerPredicateProvider(@framework))
 
       @framework.deviceManager.registerDeviceClass("IFTTTDevice", {
         configDef: deviceConfigDef.IFTTTDevice, 
@@ -40,9 +41,9 @@ module.exports = (env) ->
           return device
       })
 
-
+  # ###IFTTTDevice class
   class IFTTTDevice extends env.devices.Device
-     
+    
     _triggerState: false
 
     actions: 
@@ -55,14 +56,15 @@ module.exports = (env) ->
         type: "boolean"
         labels: ['triggered', 'waiting']
 
+    # Default Device constructor
     constructor: (@config) ->
       @name = @config.name
       @id = @config.id
-      env.logger.debug("IFTTTPlugin constructor:", @_triggerState)
       super()
 
+    # This action-method is dynamically added to the REST API. Use
+    # http://<URL:PORT>/api/device/<device-id>/trigger
     trigger: ->
-      env.logger.debug("IFTTTPlugin TRIGGERED:", @_triggerState)
       @_setTriggerState(true)
       @_setTriggerState(false)
 
@@ -71,16 +73,16 @@ module.exports = (env) ->
       @_triggerState = value
       @emit 'triggerState', value
 
-
     getTriggerState: -> Promise.resolve(@_triggerState)
 
-
-  # https://github.com/pimatic/pimatic/blob/a495c5c97d68c7a7c3f552fc541798f50bc41911/lib/predicates.coffee
-  class TriggerPredicateProvider extends env.predicates.PredicateProvider
+  # ###IFTTTTriggerPredicateProvider class
+  class IFTTTTriggerPredicateProvider extends env.predicates.PredicateProvider
 
     constructor: (@framework) ->
 
     parsePredicate: (input, context) ->
+      
+      # Get all IFTTTDevices to apply the predicate.
       iftttDevices = 
           _(@framework.deviceManager.devices).values()
             .filter((device) => device instanceof IFTTTDevice).value()
@@ -89,8 +91,8 @@ module.exports = (env) ->
       negated = null
       match = null
       
-      iftttFilter = (v) => 
-        v.trim() in ["triggered", "waiting"]
+      # Autocomplete filter used by matcher.
+      iftttFilter = (v) => v.trim() in ["triggered", "waiting"]
 
       M(input, context)
         .matchDevice(iftttDevices, (next, d) =>
@@ -115,26 +117,27 @@ module.exports = (env) ->
         return {
           token: match
           nextInput: input.substring(match.length)
-          predicateHandler: new TriggerPredicateHandler(device, negated)
+          predicateHandler: new IFTTTTriggerPredicateHandler(device, negated)
         }
       else
         return null
 
-  class TriggerPredicateHandler extends env.predicates.PredicateHandler
+  # ###IFTTTTriggerPredicateProvider class
+  class IFTTTTriggerPredicateHandler extends env.predicates.PredicateHandler
 
     constructor: (@device, @negated) ->
 
     setup: ->
       @triggerListener = (p) => 
-        env.logger.debug("triggerListener:", p)
         @emit 'change', (if @negated then not p else p)
       
       @device.on 'triggerState', @triggerListener
       super()
 
-    getValue: -> @device.getUpdatedAttributeValue('triggerState').then(
-      (p) => (if @negated then not p else p)
-    )
+    getValue: -> 
+      @device.getUpdatedAttributeValue('triggerState').then(
+        (p) => (if @negated then not p else p)
+      )
 
     destroy: -> 
       @device.removeListener "triggerState", @triggerListener
@@ -142,11 +145,10 @@ module.exports = (env) ->
 
     getType: -> 'state'
 
-
   # ###Finally
-  # Create a instance of my plugin
+  # Create a instance of the plugin...
   ifttt = new IFTTTPlugin
   ifttt.IFTTTDevice = IFTTTDevice
   
-  # and return it to the framework.
+  # ...and return it to the framework.
   return ifttt
