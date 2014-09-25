@@ -1,11 +1,13 @@
-{ "name": "pimatic-plugin-template",
-  "description": "The plugin description",
-  "author": "Your Name <you@example.com> (http://your-website)",
-  "main": "my-plugin",
+{
+  "name": "pimatic-ifttt",
+  "description": "Pimatic IFTTT Sensor",
+  "author": "Bas Wenneker <b.wenneker@gmail.com> (http://baswenneker.github.io)",
+  "main": "pimatic-ifttt",
   "files": [
-    "my-plugin.coffee",
-    "README.md",
-    "my-plugin-config-schema.coffee"
+    "pimatic-ifttt.coffee",
+    "device-config-schema.coffee",
+    "ifttt-config-schema.coffee",
+    "README.md"
   ],
   "version": "0.8.0",
   "homepage": "http://your-plugin-website",
@@ -14,9 +16,8 @@
     "type": "git",
     "url": "git://github.com/pimatic/pimatic-plugin-template.git"
   },
-  "configSchema": "my-plugin-config-schema.coffee",
-  "dependencies": {
-  },
+  "configSchema": "ifttt-config-schema.coffee",
+  "dependencies": {},
   "peerDependencies": {
     "pimatic": "0.8.*"
   },

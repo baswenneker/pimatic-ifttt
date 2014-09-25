@@ -1,0 +1,154 @@
+# https://github.com/fcingolani/node-ifttt
+# http://83.84.103.87:4567/api/devices/ifttt-device/setPresent
+# localhost:4567/api/devices/ifttt-device/toggle
+
+module.exports = (env) ->
+
+  # Require the [bluebird](https://github.com/petkaantonov/bluebird) promise library.
+  Promise = env.require 'bluebird'
+
+  # Require the [cassert library](https://github.com/rhoot/cassert).
+  assert = env.require 'cassert'
+
+  # Matcher for autocompletion of rules
+  M = env.matcher
+
+  # Utility library [lodash](http://lodash.com).
+  _ = env.require 'lodash'
+
+  # ###IFTTTPlugin class
+  class IFTTTPlugin extends env.plugins.Plugin
+
+    # ####init()
+    #  
+    # #####params:
+    #  * `app` is the [express] instance the framework is using.
+    #  * `framework` the framework itself
+    #  * `config` the properties the user specified as config for your plugin in the `plugins` 
+    #     section of the config.json file 
+    #     
+    # 
+    init: (app, @framework, @config) =>
+      env.logger.debug("IFTTTPlugin init")
+
+      deviceConfigDef = require("./device-config-schema")
+      
+      @framework.ruleManager.addPredicateProvider(new TriggerPredicateProvider(@framework))
+
+      @framework.deviceManager.registerDeviceClass("IFTTTDevice", {
+        configDef: deviceConfigDef.IFTTTDevice, 
+        createCallback: (config) => 
+          device = new IFTTTDevice(config)
+          return device
+      })
+
+
+  class IFTTTDevice extends env.devices.Device
+     
+    _triggerState: false
+
+    actions: 
+      trigger:
+        description: "triggers the switch"
+
+    attributes:
+      triggerState:
+        description: "state of the trigger"
+        type: "boolean"
+        labels: ['triggered', 'waiting']
+
+    constructor: (@config) ->
+      @name = @config.name
+      @id = @config.id
+      env.logger.debug("IFTTTPlugin constructor:", @_triggerState)
+      super()
+
+    trigger: ->
+      env.logger.debug("IFTTTPlugin TRIGGERED:", @_triggerState)
+      @_setTriggerState(true)
+      @_setTriggerState(false)
+
+    _setTriggerState: (value) ->
+      if @_triggerState is value then return
+      @_triggerState = value
+      @emit 'triggerState', value
+
+
+    getTriggerState: -> Promise.resolve(@_triggerState)
+
+
+  # https://github.com/pimatic/pimatic/blob/a495c5c97d68c7a7c3f552fc541798f50bc41911/lib/predicates.coffee
+  class TriggerPredicateProvider extends env.predicates.PredicateProvider
+
+    constructor: (@framework) ->
+
+    parsePredicate: (input, context) ->
+      iftttDevices = 
+          _(@framework.deviceManager.devices).values()
+            .filter((device) => device instanceof IFTTTDevice).value()
+
+      device = null
+      negated = null
+      match = null
+      
+      iftttFilter = (v) => 
+        v.trim() in ["triggered", "waiting"]
+
+      M(input, context)
+        .matchDevice(iftttDevices, (next, d) =>
+          next.match(" is")
+            .match([" triggered", " waiting"], {acFilter: iftttFilter},(m,s) =>
+            
+              # Already had a match with another device?
+              if device? and device.id isnt d.id
+                context?.addError(""""#{input.trim()}" is ambiguous.""")
+                return
+
+              device = d
+              negated = (s.trim() is "waiting")
+              match = m.getFullMatch()
+            )
+      )
+      
+      if match?
+        assert device?
+        assert negated?
+        assert typeof match is "string"
+        return {
+          token: match
+          nextInput: input.substring(match.length)
+          predicateHandler: new TriggerPredicateHandler(device, negated)
+        }
+      else
+        return null
+
+  class TriggerPredicateHandler extends env.predicates.PredicateHandler
+
+    constructor: (@device, @negated) ->
+
+    setup: ->
+      @triggerListener = (p) => 
+        env.logger.debug("triggerListener:", p)
+        @emit 'change', (if @negated then not p else p)
+      
+      @device.on 'triggerState', @triggerListener
+      super()
+
+    getValue: -> @device.getUpdatedAttributeValue('triggerState').then(
+      (p) => (if @negated then not p else p)
+    )
+
+    destroy: -> 
+      @device.removeListener "triggerState", @triggerListener
+      super()
+
+    getType: -> 'state'
+
+
+  # ###Finally
+  # Create a instance of my plugin
+  ifttt = new IFTTTPlugin
+  ifttt.IFTTTDevice = IFTTTDevice
+  
+  # and return it to the framework.
+  return ifttt
