@@ -1,6 +1,6 @@
 {
   "name": "pimatic-ifttt",
-  "description": "Pimatic IFTTT Sensor",
+  "description": "Pimatic IFTTT Device",
   "author": "Bas Wenneker <b.wenneker@gmail.com> (http://baswenneker.github.io)",
   "main": "pimatic-ifttt",
   "files": [
@@ -10,15 +10,17 @@
     "LICENSE",
     "README.md"
   ],
-  "version": "0.8.0",
+  "version": "0.1.1",
   "homepage": "http://baswenneker.github.io",
-  "private": true,
+  "private": false,
   "repository": {
     "type": "git",
     "url": "git://github.com/baswenneker/pimatic-ifttt.git"
   },
   "configSchema": "ifttt-config-schema.coffee",
-  "dependencies": {},
+  "dependencies": {
+    "node-ifttt": "baswenneker/node-ifttt"
+  },
   "peerDependencies": {
     "pimatic": "0.8.*"
   },

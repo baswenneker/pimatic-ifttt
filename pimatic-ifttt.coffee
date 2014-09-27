@@ -14,6 +14,9 @@ module.exports = (env) ->
   # Utility library [lodash](http://lodash.com).
   _ = env.require 'lodash'
 
+  connect = env.require 'connect'
+  ifttt   = env.require '../index'
+
   # ###IFTTTPlugin class
   class IFTTTPlugin extends env.plugins.Plugin
 
@@ -40,6 +43,12 @@ module.exports = (env) ->
           device = new IFTTTDevice(config)
           return device
       })
+
+      @setupNodeIFTTT()
+
+    setupNodeIFTTT: =>
+      
+
 
   # ###IFTTTDevice class
   class IFTTTDevice extends env.devices.Device
