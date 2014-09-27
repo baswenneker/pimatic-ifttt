@@ -1,6 +1,6 @@
 # #IFTTTPlugin configuration options
 module.exports = {
-  title: "IFTTTPlugin configurtion"
+  title: "IFTTTPlugin configuration"
   type: "object"
   properties: {}
 }

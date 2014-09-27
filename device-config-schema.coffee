@@ -4,13 +4,14 @@ module.exports = {
     title: "IFTTTDevice config options"
     type: "object"
     properties: {}
-      ###host:
-        description: "the ip or hostname to ping"
+      host:
+        description: "the ip or hostname of the fake XMLRPC Server"
         type: "string"
-        default: ""
-      interval:
-        description: "the delay between pings"
+        default: "localhost"
+      port:
+        description: "the portnumber of the fake XMLRPC Server"
         type: "number"
-        default: 5000###
+        default: 3001
+
   }
 }
