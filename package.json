@@ -19,7 +19,6 @@
   },
   "configSchema": "ifttt-config-schema.coffee",
   "dependencies": {
-    "node-ifttt": "baswenneker/node-ifttt"
   },
   "peerDependencies": {
     "pimatic": "0.8.*"

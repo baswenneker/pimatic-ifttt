@@ -14,10 +14,6 @@ module.exports = (env) ->
   # Utility library [lodash](http://lodash.com).
   _ = env.require 'lodash'
 
-  ifttt   = require 'node-ifttt'
-  connect = require 'node-ifttt/node_modules/connect'
-  
-
   # ###IFTTTPlugin class
   class IFTTTPlugin extends env.plugins.Plugin
 
@@ -32,7 +28,7 @@ module.exports = (env) ->
     # 
     init: (app, @framework, @config) =>
       deviceConfigDef = require("./device-config-schema")
-      
+
       # Add the predicate provider to enable the following rules:
       #   IF my-ifttt-device is triggered
       #   IF my-ifttt-device is waiting
@@ -44,12 +40,6 @@ module.exports = (env) ->
           device = new IFTTTDevice(config)
           return device
       })
-
-      @setupIFTTTServer()
-
-    setupIFTTTServer: =>
-      
-
 
   # ###IFTTTDevice class
   class IFTTTDevice extends env.devices.Device
@@ -107,7 +97,7 @@ module.exports = (env) ->
       M(input, context)
         .matchDevice(iftttDevices, (next, d) =>
           next.match(" is")
-            .match([" triggered", " waiting"], {acFilter: iftttFilter},(m,s) =>
+          .match([" triggered", " waiting"], {acFilter: iftttFilter},(m,s) =>
             
               # Already had a match with another device?
               if device? and device.id isnt d.id
@@ -117,9 +107,9 @@ module.exports = (env) ->
               device = d
               negated = (s.trim() is "waiting")
               match = m.getFullMatch()
-            )
-      )
-      
+          )
+        )
+
       if match?
         assert device?
         assert negated?
