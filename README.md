@@ -74,6 +74,15 @@ $ npm install
 
 Tip: use [vagrant-pimatic-dev](https://github.com/baswenneker/vagrant-pimatic-dev) to set up a virtual pimatic development environment.
 
+### Running plugin tests
+It's easy as pie, just run the following from `<pimatic-root-directory>/node_modules/pimatic`:
+
+```bash
+$ grunt test:pimatic-ifttt
+```
+
+The tests are found in `<pimatic-root-directory>/node_modules/pimatic-ifttt/test`.
+
 ### TODO: integrate node-ifttt
 At the moment the pimatic API should be publicly accessible so that a webservice is able to trigger the pimatic-ifttt plugin. This is not preferable because this allows other people to switch off your lights from the other side of the world :)
 
