@@ -1,8 +1,17 @@
 #pimatic-ifttt
 
+`pimatic-ifttt` is a [pimatic](http://pimatic.org) plugin which allows IFTTT to trigger certain actions in pimatic. Here are a few usecases:
+
+ * If you're in the proximity of your home turn on the lights.
+ * Turn off the lights if you're leaving town.
+ * Rinkle a bell when a friend posts to Facebook.
+ * Etc.
+
+With `pimatic-ifttt` you use IFTTT events to trigger your home automation!
+
 ## Setup
 
-### Setting up pimatic
+### Step 1: Setting up pimatic
 Add the following to the `plugins` section of `config.json`:
 ```json
 {
@@ -10,13 +19,10 @@ Add the following to the `plugins` section of `config.json`:
 }
 ```
 
-Pimatic will automatically download the plugin. If something goes wrong or you want to install it manually, just do from `<pimatic folder>\node_modules\`:
+Pimatic will automatically download the plugin.
 
-```bash
-sudo npm install pimatic-ifttt
-```
+Now add a device to the `devices` section :
 
-Then add a device to the `devices` section:
 ```json
 {
     "id": "ifttt-device",
@@ -39,29 +45,34 @@ To test if the API works, add the following rule
 Now restart the `pimatic.js` daemon and trigger the api:
 
 ```
-http://localhost:[portnumber]/api/device/ifttt-device/trigger
+http://<pimatic-ip-address>:[portnumber]/api/device/ifttt-device/trigger
 ```
 
 In the pimatic message interface you'll see the log message.
 
-### Setting up IFTTT
+### Step 2: Setting up IFTTT
 To have IFTTT trigger pimatic, use (this)[https://github.com/captn3m0/ifttt-webhook] guide.
 
 In short: you set up IFTTT to create a Wordpress blog post when an event is triggered. The post is send to a website which in turn triggers the pimatic-ifttt API. 
 
 __For this to work the pimatic API should be publicly accessible.__ Your router should route traffic from outside your local lan to pimatic. This is a drawback although I'm not sure of the risks. I have only tested this while authentication was disabled. See the _Contribute/TODO_ section below for a solution.
 
+### Using pimatic-ifttt
+To use this plugin just add a device like explained above. Then use the `pimatic` rule editor to add actions when the device (or IFTTT event) is triggered.
+
 ## Contribute
-Here's how to set up pimatic-ifttt development:
+Here's how to set up `pimatic-ifttt` for development:
 
 ```bash
-$ cd pimatic/node_modules
+$ cd <pimatic-root-directory>/node_modules
 $ git clone https://github.com/baswenneker/pimatic-ifttt.git
 $ cd pimatic-ifttt
 
 # To install all dependencies, execute:
 $ npm install
 ```
+
+Tip: use [vagrant-pimatic-dev](https://github.com/baswenneker/vagrant-pimatic-dev) to set up a virtual pimatic development environment.
 
 ### TODO: integrate node-ifttt
 At the moment the pimatic API should be publicly accessible so that a webservice is able to trigger the pimatic-ifttt plugin. This is not preferable because this allows other people to switch off your lights from the other side of the world :)
