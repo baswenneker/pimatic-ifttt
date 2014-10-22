@@ -1,7 +1,9 @@
 {
   "name": "pimatic-ifttt",
-  "description": "Pimatic IFTTT Device",
-  "author": "Bas Wenneker <b.wenneker@gmail.com> (http://baswenneker.github.io)",
+  "description": "Pimatic IFTTT Device: a plugin enabling IFTTT to trigger pimatic devices/actions.",
+  "author_name": "Bas Wenneker <b.wenneker@gmail.com> (http://baswenneker.github.io)",
+  "author_url": "http://baswenneker.github.io",
+  "npmUser": "baswenneker",
   "main": "pimatic-ifttt",
   "files": [
     "pimatic-ifttt.coffee",
@@ -10,8 +12,13 @@
     "LICENSE",
     "README.md"
   ],
+  "keywords": [
+    "devices",
+    "predicates",
+    "IFTTT"
+  ],
   "version": "0.1.1",
-  "homepage": "http://baswenneker.github.io",
+  "homepage": "https://github.com/baswenneker/pimatic-ifttt",
   "private": false,
   "repository": {
     "type": "git",
